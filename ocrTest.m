@@ -1,7 +1,7 @@
 clc, close all, clear all
 
 % Read image
-image=imread('DSC_3.JPG');
+image=imread('DSC_1.JPG');
 
 % Resize image
 image=imresize(image, 0.3);
@@ -40,12 +40,14 @@ title('image with median filter');
 
 % use adaptive histogram equalisation
 image = adapthisteq(image,'ClipLimit',0.003);
+%image=adapthisteq_own(image);
 figure(4);
 imshow(image);
 title('image with histogram equalisation');
 
 % contrast stretching
-image = imadjust(image);
+% image = imadjust(image);
+image = imadjust(image,[0.15 0.48],[]);
 figure(5);
 imshow(image);
 title('contrast stretching');
