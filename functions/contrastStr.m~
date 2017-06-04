@@ -1,0 +1,39 @@
+function [ output_args ] = contrastStr( image )
+%CONTRASTSTR Summary of this function goes here
+%   Detailed explanation goes here
+
+image=imread('pout.tif');
+r1=input('Enter the value of r1 (64-128)');
+r2=input('Enter the value of r2 (129-192)');
+s1=input('Enter the value of s1 (0-64)');
+s2=input('Enter the value of s2 (192-255)');
+
+s=size(image);
+subplot(1,2,1);
+imshow(image);
+title('Original Image');
+% Calculating l
+l=s1/r1;
+%Calculating m
+m=(s2-s1)/(r2-r1);
+%Calculating n
+n=(255-s2)/(255-r2);
+
+for x=1:s(1)
+    for y=1:s(2)
+        if image(x,y)>=0 && image(x,y)<r1
+            p(x,y)=l*double(image(x,y));
+        elseif image(x,y)>=r1 && image(x,y)<r2
+            p(x,y)=m*(double(image(x,y))-r1)+s1;
+        elseif image(x,y)>=r2 && image(x,y)<=255
+            p(x,y)=n*(double(image(x,y))-r2)+s2;
+        end
+    end
+end
+ subplot(1,2,2);
+ imshow(uint8(p));
+ title('After contrast stretching');
+
+
+end
+

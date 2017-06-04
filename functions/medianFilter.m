@@ -1,39 +1,37 @@
-function outImage = medianFilter( image, sizeFilter )
+function outImage = medianFilter( image, sizeFilter, T )
 
-    %sizeFilter is square sizeFilter x sizeFilter (e.g. 3x3)
+    % FILTR MEDIANOWY
+ %
+ % obraz - obraz do odfiltrowania (jedna maska obrazu)
+ % dlugosc_filtru - rozmiar otoczenia piksela
+ % (macierz o wymiarach dlugosc_filtru X dlugosc_filtru)
+ % T - wartość o ile musi się różnić piksel od mediany, żeby go odfiltrować
 
-    %add zeros to image edgeds
-    addZeros = sizeFilter - 1;
-    extendedImg=zeros(size(image)+addZeros);
-    outImage=zeros(size(image));
-
-    %copy original img to extended
     
-    shift=floor(addZeros/2);
-    for x=1:size(image,1)
-        for y=1:size(image,2)
-            extendedImg(x+shift,y+shift)=image(x,y);
-        end
-    end
+    rozmiar_maski = size(image); % rozmiar obrazu do odfiltrowania
+ 
+    % liczba pikseli o które trzeba  będzie powiększyć obraz z każdej strony aby prawidłowo filtrować 
+    addPixels = floor(sizeFilter/2);
     
-    % makeing array('window') that copies values of pixels in range FILTER_SIZE x FILTER_SIZE (e.g. 3x3)
+    % tworzy macierz o wymiarach jak obraz  ale z powiększonymi wymiarami X i Y o addPixels
+    extendedImg=uint8(ones(rozmiar_maski(1) + 2*addPixels, rozmiar_maski(2) + 2*addPixels, 1));
 
-    for i= 1:size(image,1)
-        for j=1:size(image,2)
-            window=zeros(sizeFilter*sizeFilter,1);
-            ind=1;
-            for x=1:sizeFilter
-                for y=1:sizeFilter
-                    window(ind)=extendedImg(i+x-1,j+y-1);
-                    ind=ind+1;
-                end
-            end
-
-            median=sort(window);
+    %kopiuje ogryginalny obraz do poszerzonego
+    extendedImg(addPixels+1:rozmiar_maski(1)+addPixels, addPixels+1:rozmiar_maski(2)+addPixels,:)=image(:,:,:);
+    outImage=double(image);
+    
+    for x= addPixels+1:rozmiar_maski(1)
+        for y=addPixels+1:rozmiar_maski(2)
             
-            %place the median pixel to the output
-            middle=round((sizeFilter*sizeFilter)/2);
-            outImage(i,j)=median(middle);
+            FilterWindow=extendedImg(x-addPixels:x+addPixels,y-addPixels:y+addPixels,1);
+            
+            mediana = median(FilterWindow(:)); % oblicza mediane z wycinka
+            % window(:) zwraca wektor kolumnowy
+            % elementów macierzy, elementy są zwracane w kolejności 'po kolumnach'
+            
+            if abs(outImage(x-addPixels,y-addPixels,1) - double(mediana)) > T % sprawdza czy różnica między medianą a wartością piksela większa niż T, jeśli tak to filtruje piksel
+              outImage(x-addPixels,y-addPixels,1) = double(mediana);
+            end
 
         end
     end

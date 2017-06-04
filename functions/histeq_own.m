@@ -1,4 +1,4 @@
-function image_out = adapthisteq_own( image_in )
+function image_out = histeq_own( image_in )
 [M,N]=size(image_in);
 histgray=jmhist(image_in);
 py=histgray/(M*N);
